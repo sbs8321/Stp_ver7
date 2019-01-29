@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Point">
+	<!-- 포인트 결제 내역 출력하기 -->
+	<!-- BOOKING_LIST 테이블, POINT 테이블 JOIN -->
+	<resultMap type="point" id="point-resultmap-collection">
+		<result column="USER_EMAIL" property="mid" />
+		<result column="DIVISION" property="division" />
+		<result column="BOOKING_ID" property="booking_id" />
+		<collection property="booking" ofType="booking">
+			<result column="BOOKING_ID" property="booking_id" />
+			<result column="PARKING_ID" property="parking_id" />
+			<result column="USER_ID" property="user_id" />
+			<result column="ENTRANCE_TIME" property="entrance_time" />
+			<result column="EXIT_TIME" property="exit_time" />
+			<result column="ENTRANCE_DATE" property="entrance_date" />
+		</collection>
+	</resultMap>
+
+	<!-- 값 여러개 나오도록 해야할 것. -->
+	<select id="pointList" parameterType="String"
+		resultMap="point-resultmap-collection">
+		SELECT *
+		FROM POINTS P, BOOKING_LIST B
+		WHERE P.BOOKING_ID = B.BOOKING_ID
+		AND
+		P.USER_EMAIL=#{USER_EMAIL}
+	</select>
+
+
+
+
+	<!-- 포인트 테이블 정보 추가 -->
+	<insert id="pointInsert" parameterType="point">
+		INSERT INTO POINTS(PNUM, USER_EMAIL, DIVISION, USE_DATE)
+		VALUES(PSEQ.NEXTVAL, #{user_email}, #{division},SYSDATE)
+	</insert>
+
+	<!-- 포인트 사용 내역 조회 -->
+	<select id="PointList" parameterType="String" resultType="point">
+		SELECT *
+		FROM POINTS
+		WHERE USER_EMAIL=#{USER_EMAIL}
+		ORDER BY USE_DATE DESC
+	</select>
+
+	<!-- payment_id update -->
+	<update id="paymentUpdate" parameterType="point">
+		UPDATE POINTS SET PAYMENT_ID=#{payment_id} WHERE BOOKING_ID=#{booking_id}
+	</update>
+
+</mapper>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Booking">
+	<!-- payment_id update -->
+	<update id="bookingChange" parameterType="booking">
+		UPDATE BOOKING_LIST SET
+		PAYMENT_FLAG=#{payment_flag}, PAYMENT_ID=#{payment_id} WHERE
+		BOOKING_ID=#{booking_id}
+	</update>
+
+	<!-- 해당 멤버의 예약정보 (결제하지 않은) -->
+	<select id="bookingInfo" parameterType="String"
+		resultType="booking">
+		SELECT * FROM BOOKING_LIST WHERE USER_ID=#{login} AND
+		PAYMENT_FLAG='0'
+	</select>
+		<!-- 해당 멤버의 예약정보 (결제하지 않은) -->
+	<select id="bookingInfo2" parameterType="String"
+		resultType="booking">
+		SELECT * FROM BOOKING_LIST WHERE BOOKING_ID = #{booking_id}
+	</select>
+
+	<!-- 주차장 신청시 booking_list에 저장하기 -->
+	   <insert id="parkingApply" parameterType="booking">
+      INSERT INTO
+      BOOKING_LIST(BOOKING_ID, PARKING_ID, USER_ID, ENTRANCE_TIME,
+      EXIT_TIME,ENTRANCE_DATE, EXIT_DATE, PRICE )
+      VALUES(BSEQ.NEXTVAL, #{parking_id},
+      #{user_id}, #{entrance_time}, #{exit_time}, #{entrance_date}, #{entrance_date}, #{price})
+   </insert>
+
+	<!-- 예약 페이지로 넘길 예약된 정보 가져오기(미추홀 주차장 vo와 join) -->
+	<resultMap type="booking" id="booking-resultmap-collection">
+		<result column="BOOKING_ID" property="booking_id" />
+		<result column="PARKING_ID" property="parking_id" />
+		<result column="USER_ID" property="user_id" />
+		<result column="ENTRANCE_TIME" property="entrance_time" />
+		<result column="EXIT_TIME" property="exit_time" />
+		<result column="ENTRANCE_DATE" property="entrance_date" />
+		<result column="PRICE" property="price" />
+		<collection property="parking" ofType="parking">
+			<result column="PRKPLCENO" property="prkplceno" />
+			<result column="PRKPLCENM" property="prkplcenm" />
+		</collection>
+	</resultMap>
+	<select id="bookingInsertInfo" parameterType="String"
+		resultMap="booking-resultmap-collection">
+		SELECT *
+		FROM BOOKING_LIST B, MEETYOUALL_PARKING_INFO M
+		WHERE B.PARKING_ID =
+		M.PRKPLCENO
+		AND B.BOOKING_ID = #{booking_id}
+	</select>
+
+	<!-- 예약 내역 페이지 -->
+
+	<select id="bookingList" parameterType="String"
+		resultMap="booking-resultmap-collection">
+		SELECT *
+		FROM BOOKING_LIST B, MEETYOUALL_PARKING_INFO M
+		WHERE B.PARKING_ID =
+		M.PRKPLCENO
+		AND B.USER_ID =#{login}
+		AND B.PAYMENT_FLAG='1'
+	</select>
+
+	<!-- 예약 전제 페이지 가져오기 -->
+	<select id="reserveList"
+		resultMap="booking-resultmap-collection">
+		SELECT *
+		FROM BOOKING_LIST B, MEETYOUALL_PARKING_INFO M
+		WHERE B.PARKING_ID = M.PRKPLCENO
+	</select>
+	
+	<!-- 예약 페이지 나갈 시 값 없애기  -->
+	<delete id="applyCancel" parameterType="String">
+		DELETE FROM BOOKING_LIST WHERE  BOOKING_ID =#{booking_id}
+	</delete>
+</mapper>

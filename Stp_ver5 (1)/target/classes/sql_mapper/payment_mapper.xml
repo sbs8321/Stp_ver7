@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Payment">
+	<!-- 입력한 결제 정보 저장하기 (임시 저장) -->
+	<insert id="paymentInput" parameterType="payment">
+		INSERT INTO
+		PAYMENT(PAYMENT_ID,PAYMENT_BALANCE, PAYMENT_STATE, USER_EMAIL)
+		VALUES
+		(PAY_SEQ.NEXTVAL, #{payment_balance},0, #{user_email})
+	</insert>
+
+	<!-- 결제 정보 가져오기 -->
+	<select id="paymentInfo" parameterType="String"
+		resultType="payment">
+		SELECT * FROM PAYMENT WHERE BOOKING_ID=#{booking_id} AND
+		PAYMENT_STATE=0
+	</select>
+	
+	<!-- 결제 정보 가져오기 -->
+	<select id="paymentInfo2" parameterType="String"
+		resultType="payment">
+		SELECT * FROM PAYMENT WHERE BOOKING_ID=#{booking_id} AND
+		PAYMENT_STATE=1
+	</select>
+
+	<!-- 결제시 추가하기 (booking_id 포함) -->
+	<insert id="paymentAdd" parameterType="payment">
+		INSERT INTO PAYMENT VALUES
+		(PAY_SEQ.NEXTVAL, #{payment_balance},#{payment_state}, #{user_email},
+		#{booking_id})
+	</insert>
+
+</mapper>

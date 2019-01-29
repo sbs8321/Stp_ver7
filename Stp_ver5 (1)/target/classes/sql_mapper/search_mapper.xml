@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Search">
+
+	<select id="pkarmark" parameterType="park" resultType="park">
+		SELECT * FROM MEETYOUALL_PARKING_INFO WHERE STATE = 1
+	</select>
+
+
+	<select id="pkList" parameterType="park" resultType="park">
+  <![CDATA[  
+  SELECT * 	FROM (
+	SELECT PRKPLCENO, PRKPLCENM, LNMADR, PRKCMPRT, BASICCHARGE,PARKIMG, ( 6371 * acos( cos( #{latitude} * (3.141592/180) ) * cos( MEETYOUALL_PARKING_INFO.LATITUDE*(3.141592/180) ) * cos( MEETYOUALL_PARKING_INFO.HARDNESS*(3.141592/180) - (#{hardness}*(3.141592/180)) ) + sin( #{latitude}*(3.141592/180) ) * sin( MEETYOUALL_PARKING_INFO.LATITUDE*(3.141592/180) ) ) ) AS distance
+	FROM MEETYOUALL_PARKING_INFO WHERE STATE = 1
+	) DATA
+	WHERE DATA.distance < 1 ORDER BY distance
+  ]]>
+	</select>
+	
+	<!-- 주차장 상세보기 정보 조회 -->
+	<select id="parkDetail" parameterType="park" resultType="park">
+		SELECT * FROM MEETYOUALL_PARKING_INFO WHERE PRKPLCENO=#{prkplceno}
+	</select>
+	
+	<!-- 예약 가능 여부 조회 -->
+	
+	<select id="bookable" parameterType="booking" resultType="int">
+	<![CDATA[
+		SELECT NVL(count(*), 0) FROM BOOKING_LIST WHERE PARKING_ID=#{parking_id} and EXIT_TIME > #{entrance_time} and ENTRANCE_TIME < #{exit_time}
+	]]>
+	</select>
+	
+	<!-- 주차장 구획수 조회 -->
+	<select id="countArea" parameterType="booking" resultType="park">
+		SELECT * FROM MEETYOUALL_PARKING_INFO WHERE PRKPLCENO=#{parking_id}
+	</select>
+	
+	<!-- 북마크 여부 -->
+		<select id="bookmaking" parameterType="park" resultType="bookmark">
+	  SELECT * FROM BOOKMARK WHERE PRKPLCENO=#{prkplceno} AND email=#{email}
+	  </select>
+	  
+	  <!-- 북마크 추가 -->
+	  <insert id="addbook" parameterType="bookmark">
+	      INSERT INTO BOOKMARK VALUES(#{email},#{prkplceno},#{prkplcenm},#{lnmadr},#{parkimg},#{prkcmprt},sysdate)
+	   </insert>
+	  
+	  <!-- 북마크 삭제 -->
+	  <delete id="delbook" parameterType="bookmark">
+	 	 DELETE BOOKMARK WHERE EMAIL=#{email} AND PRKPLCENO=#{prkplceno}
+	  </delete>
+	  
+	  <!-- search 북마크 리스트 -->
+	  <select id="bkList" parameterType="bookmark" resultType="bookmark">
+	 	SELECT * FROM BOOKMARK WHERE EMAIL=#{email}
+	  </select>
+	  	
+	  <!-- 댓글 작성 처리 -->
+ 	<insert id="replyWrite" parameterType="reply" useGeneratedKeys="true" 
+ 			keyProperty="reply_num">
+ 		INSERT INTO REPLY VALUES (REPLY_SEQ.nextval, #{reply_id}, #{reply_content}, #{reply_bNum}, SYSDATE)
+ 		
+ 		<selectKey keyProperty="reply_num" resultType="int" order="AFTER">
+ 			SELECT REPLY_SEQ.CURRVAL FROM DUAL
+ 		</selectKey>
+ 	</insert>
+ 	
+ 	<select id="replyList" parameterType="String" resultType="reply">
+ 		SELECT * FROM REPLY WHERE REPLY_BNUM=#{parkingId} ORDER BY REPLY_NUM ASC
+ 	</select>
+ 	
+ 	<delete id="replyDelete" parameterType="reply">
+ 		DELETE FROM REPLY WHERE REPLY_ID=#{reply_id} AND REPLY_NUM=#{reply_num}
+ 	</delete>
+ 	
+	  	
+	   <!-- 주차장 등록 -->
+	 <insert id="registerParking" parameterType="park" useGeneratedKeys="true" keyProperty="prkplceno">
+		 INSERT INTO MEETYOUALL_PARKING_INFO VALUES(PKNUM_SEQ.nextval,#{prkplcenm},#{prkplcese},#{prkplcetype},#{rdnmadr},#{lnmadr},#{prkcmprt},#{basictime},#{basiccharge},#{daycmmtkt},#{monthcmmtkt},#{metpay},#{spcmnt},#{latitude},#{hardness},#{parkimg},#{hourpayment},0,#{owner})
+	  	
+	  	<selectKey keyProperty="prkplceno" resultType="String" order="AFTER">
+ 			SELECT PKNUM_SEQ.CURRVAL FROM DUAL
+ 		</selectKey>
+	 </insert>	
+	  	
+	  	<!-- 기업 내주차장 -->
+	  <select id="myparkingkList" parameterType="bookmark" resultType="park">
+	 	SELECT * FROM MEETYOUALL_PARKING_INFO WHERE OWNER=#{email}
+	  	</select>
+	  	
+	  	<!-- 주차장 수정시 내주차장 정보 보기 -->
+	  	<select id="modifyparkForm" parameterType="park" resultType="park">
+	 	SELECT * FROM MEETYOUALL_PARKING_INFO WHERE PRKPLCENO=#{prkplceno}
+	  	</select>
+	  	<!-- 주차장 수정 -->
+	  	<update id="modifyparking" parameterType="park" >
+	  	UPDATE MEETYOUALL_PARKING_INFO SET PRKPLCENM=#{prkplcenm},PRKPLCESE=#{prkplcese},PRKPLCETYPE=#{prkplcetype},RDNMADR=#{rdnmadr},LNMADR=#{lnmadr},PRKCMPRT=#{prkcmprt},BASICTIME=#{basictime},BASICCHARGE=#{basiccharge},DAYCMMTKT=#{daycmmtkt},MONTHCMMTKT=#{monthcmmtkt},METPAY=#{metpay},SPCMNT=#{spcmnt},LATITUDE=#{latitude},HARDNESS=#{hardness},HOURPAYMENT=#{hourpayment} WHERE PRKPLCENO=#{prkplceno}
+	  	</update>
+	  	<!-- 주차장 삭제 -->
+	  	<delete id="deletePark" parameterType="park">
+ 		DELETE FROM MEETYOUALL_PARKING_INFO WHERE PRKPLCENO=#{prkplceno}
+ 		</delete>
+ 		<!-- 미승인 주차장 리스트 -->
+ 		<select id="stateList" parameterType="park" resultType="park">
+		SELECT * FROM MEETYOUALL_PARKING_INFO WHERE STATE = 0
+		</select>
+		<!-- 주차장 승인 -->
+		<update id="confirmpark" parameterType="park" >
+	  	UPDATE MEETYOUALL_PARKING_INFO SET STATE=1 WHERE PRKPLCENO=#{prkplceno}
+	  	</update> 	
+</mapper>

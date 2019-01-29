@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<typeAliases>
+		<typeAlias alias="user" type="com.icia.stp.vo.UserVo" />
+		<typeAlias alias="owner" type="com.icia.stp.vo.OwnerVo" />
+		<typeAlias alias="park" type="com.icia.stp.vo.MeetyouallParkVo"/>
+		<typeAlias alias="booking" type="com.icia.stp.vo.BookingVo"/>
+		<typeAlias alias="bookmark" type="com.icia.stp.vo.BookMarkVo"/>
+		<typeAlias alias="reply" type="com.icia.stp.vo.ReplyVo"/>
+		<typeAlias alias="point" type="com.icia.stp.vo.PointVo"/>
+		<typeAlias alias="payment" type="com.icia.stp.vo.PaymentVo"/>
+		<typeAlias alias="parking" type="com.icia.stp.vo.MeetyouallParkVo"/>
+		<typeAlias alias="exchange" type="com.icia.stp.vo.ExchangeVo"/>
+		<typeAlias alias="paymentList" type="com.icia.stp.vo.PaymentListVo"/>
+	</typeAliases>
+</configuration>

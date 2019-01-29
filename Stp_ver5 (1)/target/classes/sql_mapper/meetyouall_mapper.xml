@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Parking">
+	<!-- 가격 계산하기 위해서  -->
+	<select id="parkingInfo" parameterType="String" resultType="parking">
+		SELECT * FROM  MEETYOUALL_PARKING_INFO WHERE PRKPLCENO = #{parking_id}
+	</select>
+	<!-- 주차장 owner의 email 찾기 -->
+	<select id="ownerEmail" parameterType="parking"
+		resultType="parking">
+		SELECT *
+		FROM MEETYOUALL_PARKING_INFO 
+		WHERE PRKPLCENM = #{prkplcenm}
+		AND PRKPLCENO = #{prkplceno}
+	</select>
+</mapper>

@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="User">
+
+
+   <select id="userchkstate" parameterType="user" resultType="user">
+      SELECT * FROM USERS WHERE EMAIL=#{email} AND STATE=1
+   </select>
+
+   <select id="userLogin" parameterType="user" resultType="user">
+      SELECT *
+      FROM USERS
+      WHERE EMAIL=#{email} AND PW = #{password}
+   </select>
+
+   <select id="ownerchkstate" parameterType="owner"
+      resultType="owner">
+      SELECT * FROM OWNERS WHERE EMAIL=#{email} AND STATE=1
+   </select>
+
+   <select id="ownerLogin" parameterType="owner" resultType="owner">
+      SELECT
+      *
+      FROM OWNERS
+      WHERE EMAIL=#{email} AND PW = #{password}
+   </select>
+
+
+   <update id="joinUser" parameterType="user">
+      UPDATE USERS SET
+      PW =
+      #{password}, NAME = #{name}, PHONE_FRONT=#{phone_front},
+      PHONE_MID=#{phone_mid},
+      PHONE_END=#{phone_end},
+      ADDR1 =
+      #{addr1}, ADDR2 =
+      #{addr2}, ADDR3 = #{addr3}, POINT = #{point},
+      MEMBERTYPE =
+      #{memberType}, AUTHKEY=#{authkey},STATE=0 WHERE
+      EMAIL=#{email}
+   </update>
+
+   <!-- 일반회원 키 등록 -->
+   <update id="usercreateAuthKey" parameterType="user">
+      UPDATE USERS SET
+      AUTHKEY=#{authkey} WHERE EMAIL=#{email}
+   </update>
+
+   <!-- 일반회원 키 검증 -->
+   <select id="userchkAuth" parameterType="user" resultType="user">
+      SELECT
+      * FROM USERS WHERE EMAIL=#{email} AND AUTHKEY=#{authkey}
+   </select>
+
+   <!-- 일반회원 권한 변경 -->
+   <update id="useruserAuth" parameterType="user">
+      UPDATE USERS SET STATE=1
+      , AUTHKEY=0 WHERE EMAIL = #{email}
+   </update>
+
+   <!-- 일반회원 비밀번호 변경 정보 체크 -->
+   <select id="userckmember" parameterType="user" resultType="user">
+      SELECT * FROM USERS WHERE EMAIL = #{email} AND NAME=#{name} AND
+      PHONE_FRONT=#{phone_front} AND
+      PHONE_MID=#{phone_mid} AND
+      PHONE_END=#{phone_end}
+   </select>
+
+   <!-- 일반회원 비밀번호 변경을 위한 정보 가져오기 -->
+   <select id="userSerch" parameterType="user" resultType="user">
+      SELECT *
+      FROM USERS WHERE EMAIL = #{email}
+   </select>
+
+   <!-- 일반회원 비밀번호 변경 -->
+   <update id="usermodifypassword" parameterType="user">
+      UPDATE USERS SET
+      PW=#{password},AUTHKEY=0 WHERE EMAIL = #{email}
+   </update>
+
+   <update id="joinOwner" parameterType="owner">
+      UPDATE OWNERS SET
+      PW =
+      #{password}, NAME = #{name}, PHONE_FRONT=#{phone_front},
+      PHONE_MID=#{phone_mid},
+      PHONE_END=#{phone_end},
+      ADDR1 =
+      #{addr1}, ADDR2 =
+      #{addr2}, ADDR3 = #{addr3}, PRKPLCENO =
+      #{prkplceno},
+      MEMBERTYPE =
+      #{memberType}, AUTHKEY=#{authkey}, STATE=0
+      WHERE EMAIL=#{email}
+   </update>
+
+   <!-- 기업 회원 키 등록 -->
+   <update id="ownercreateAuthKey" parameterType="owner">
+      UPDATE OWNERS SET
+      AUTHKEY=#{authkey} WHERE EMAIL=#{email}
+   </update>
+
+   <!-- 기업 회원 키 검증 -->
+   <select id="ownerchkAuth" parameterType="user"
+      resultType="owner">
+      SELECT * FROM OWNERS WHERE EMAIL=#{email} AND
+      AUTHKEY=#{authkey}
+   </select>
+
+   <!-- 기업 회원 권한 변경 -->
+   <update id="owneruserAuth" parameterType="owner">
+      UPDATE OWNERS SET
+      STATE=1 , AUTHKEY=0 WHERE EMAIL = #{email}
+   </update>
+
+
+   <!--기업 회원 비밀번호 변경 정보 체크 -->
+   <select id="ownerckmember" parameterType="owner"
+      resultType="owner">
+      SELECT * FROM OWNERS WHERE EMAIL = #{email} AND
+      NAME=#{name} AND
+      PHONE_FRONT=#{phone_front} AND
+      PHONE_MID=#{phone_mid} AND
+      PHONE_END=#{phone_end}
+   </select>
+
+   <!-- 기업 회원 비밀번호 변경을 위한 정보 가져오기 -->
+   <select id="ownerSearch" parameterType="owner"
+      resultType="owner">
+      SELECT * FROM OWNERS WHERE EMAIL = #{email}
+   </select>
+
+   <!-- 기업 회원 비밀번호 변경 -->
+   <update id="ownermodifypassword" parameterType="owner">
+      UPDATE OWNERS SET
+      PW=#{password},AUTHKEY=0 WHERE EMAIL = #{email}
+   </update>
+
+
+
+
+   <select id="userFindId" parameterType="user" resultType="user">
+      SELECT * FROM USERS WHERE NAME=#{name} AND PHONE_MID=#{phone_mid} AND PHONE_END=#{phone_end}
+   </select>
+
+
+   <select id="ownerFindId" parameterType="user" resultType="owner">
+      SELECT * FROM OWNERS WHERE NAME=#{name} AND PHONE_MID=#{phone_mid} AND PHONE_END=#{phone_end}
+   </select>
+
+   <select id="userFindPassword" parameterType="user"
+      resultType="user">
+      SELECT
+      * FROM USERS WHERE USERID = #{id} AND NAME = #{name}
+      AND EMAIL = #{email}
+   </select>
+
+   <select id="ownerFindPassword" parameterType="user"
+      resultType="owner">
+      SELECT
+      * FROM OWNERS WHERE OWNERID = #{id} AND NAME =
+      #{name} AND EMAIL = #{email}
+   </select>
+
+   <!-- 이메일 중복확인 -->
+   <select id="idOverlap" parameterType="user" resultType="user">
+      SELECT *
+      FROM USERS WHERE EMAIL=#{email}
+   </select>
+
+   <!-- 기업 회원 이메일 중복확인 -->
+   <select id="idOverlapOwner" parameterType="owner"
+      resultType="owner">
+      SELECT *
+      FROM OWNERS WHERE EMAIL=#{email}
+   </select>
+
+   <!-- 중복확인 된 id 삽입 -->
+   <insert id="idInsert" parameterType="user">
+      INSERT INTO USERS (EMAIL)
+      VALUES(#{email})
+   </insert>
+
+   <!-- 기업회원 중복확인 된 id 삽입 -->
+   <insert id="idInsertOwner" parameterType="owner">
+      INSERT INTO OWNERS
+      (EMAIL)
+      VALUES(#{email})
+   </insert>
+
+   <!-- 회원가입 취소 -->
+   <delete id="joinCancel" parameterType="user">
+      DELETE FROM USERS WHERE
+      EMAIL=#{email}
+   </delete>
+
+   <!-- 회원가입 취소 -->
+   <delete id="joinCancelOwner" parameterType="owner">
+      DELETE FROM OWNERS
+      WHERE
+      EMAIL=#{email}
+   </delete>
+	<!-- ************************************************************************************ 
+		결제 관련 -->
+	<!-- 포인트 잔액 -->
+	<select id="pointBalance" parameterType="String"
+		resultType="user">
+		SELECT * FROM USERS WHERE EMAIL=#{email}
+	</select>
+
+	<!-- 로그인한 회원 정보 조회 -->
+	<select id="memberInfo" parameterType="String" resultType="user">
+		SELECT * FROM USERS WHERE EMAIL=#{login}
+	</select>
+
+	<!-- 포인트 충전 -->
+	<update id="pointUp" parameterType="user">
+		UPDATE USERS SET
+		POINT=POINT+#{point} WHERE EMAIL=#{email}
+	</update>
+
+	<!-- 포인트 사용 -->
+	<update id="pointUse" parameterType="user">
+		UPDATE USERS SET POINT=
+		POINT-#{point} WHERE EMAIL=#{email}
+	</update>
+	<!-- admin 계좌 증가 -->
+	<update id="adminBalanceUp" parameterType="user">
+		UPDATE USERS SET
+		BALANCE=BALANCE+#{balance} WHERE NAME=#{name}
+	</update>
+	<!-- ************************************************************************************ 
+		마이페이지 관련 -->
+	<!-- user 개인 정보 -->
+	<select id="userInfo" parameterType="String">
+		SELECT * FROM USERS WHERE
+		EMAIL=#{login}
+	</select>
+	<!-- admin balance 변경 -->
+	<update id="adminUpdate" parameterType="user">
+			UPDATE USERS SET BALANCE = BALANCE-#{balance} WHERE NAME=#{name}
+	</update>
+	
+	<!-- 회원 관리 페이지 (user list) -->
+	<select id="userList" resultType="user">
+		SELECT * FROM USERS 	
+	</select>
+</mapper>

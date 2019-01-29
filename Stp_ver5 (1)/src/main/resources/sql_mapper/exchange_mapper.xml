@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Exchange">
+
+	<!-- 환전 신청 내역 저장하기 -->
+	<insert id="exchangeInsert" parameterType="exchange">
+		INSERT INTO EXCHANGE
+		VALUES (EX_SEQ.NEXTVAL, #{owner_id}, #{balance}, SYSDATE)
+	</insert>
+	<!--환전 신청 목록 가져오기 -->
+	<resultMap type="exchange" id="exchange-resultmap-collection">
+		<result column="EXCHANGE_ID" property="exchange_id" />
+		<result column="OWNER_ID" property="owner_id" />
+		<result column="BALANCE" property="balance" />
+		<result column="APPLY_DATE" property="apply_date" />
+		<collection property="owner" ofType="owner">
+			<result column="NAME" property="name" />
+			<result column="EMAIL" property="email" />
+		</collection>
+	</resultMap>
+	<select id="exchangeLists"
+		resultMap="exchange-resultmap-collection">
+		SELECT *
+		FROM EXCHANGE E, OWNERS O
+		WHERE E.OWNER_ID = O.EMAIL
+		ORDER BY E.EXCHANGE_ID
+	</select>
+	<select id="exchangeList" parameterType="String" resultMap="exchange-resultmap-collection">
+		SELECT *
+		FROM EXCHANGE E, OWNERS O
+		WHERE E.OWNER_ID = O.EMAIL
+		AND E.OWNER_ID=#{login}
+	</select>
+
+	<!-- 환전 번호에 해당하는 balance 가져오기 -->
+	<select id="exchangeIdBalance" parameterType="String"
+		resultType="exchange">
+		SELECT * FROM EXCHANGE WHERE EXCHANGE_ID =#{exchange_id}
+	</select>
+	<!-- 승인된 환전 테이블에서 삭제하기 -->
+	<delete id="exchangeDelete" parameterType="String">
+		DELETE FROM EXCHANGE
+		WHERE EXCHANGE_ID=#{exchange_id}
+	</delete>
+</mapper>
